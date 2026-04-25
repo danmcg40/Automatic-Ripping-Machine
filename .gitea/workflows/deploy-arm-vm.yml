@@ -1,0 +1,44 @@
+name: Deploy Ripper VM
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/ripper-vm/**'
+      - '.gitea/workflows/deploy-ripper-vm.yml'
+
+jobs:
+  deploy:
+    runs-on: [linux, docker]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Prepare persistent Terraform workspace
+        run: |
+          mkdir -p /workspace/ripper-vm
+          find /workspace/ripper-vm -mindepth 1 -maxdepth 1 \
+            ! -name 'terraform.tfstate' \
+            ! -name 'terraform.tfstate.backup' \
+            ! -name '.terraform' \
+            ! -name '.terraform.lock.hcl' \
+            -exec rm -rf {} +
+          cp -a "$GITHUB_WORKSPACE/terraform/ripper-vm/." /workspace/ripper-vm/
+
+      - name: Terraform init
+        run: |
+          cd /workspace/ripper-vm
+          terraform init
+
+      - name: Terraform apply
+        run: |
+          cd /workspace/ripper-vm
+          terraform apply -auto-approve
+
+      - name: Show outputs
+        run: |
+          cd /workspace/ripper-vm
+          terraform output

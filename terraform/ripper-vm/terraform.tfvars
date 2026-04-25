@@ -1,6 +1,4 @@
 pm_api_url          = "https://192.168.0.60:8006/api2/json"
-pm_api_token_id     = PM_API_TOKEN_ID
-pm_api_token_secret = PM_API_TOKEN_SECRET
 
 template_name  = "ubuntu-template"
 vm_name        = "automatic-ripping-machine"

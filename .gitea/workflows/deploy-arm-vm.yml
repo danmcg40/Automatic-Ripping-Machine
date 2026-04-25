@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/ripper-vm/**'
-      - '.gitea/workflows/deploy-ripper-vm.yml'
+      - 'terraform/arm-vm/**'
+      - '.gitea/workflows/deploy-arm-vm.yml'
 
 jobs:
   deploy:

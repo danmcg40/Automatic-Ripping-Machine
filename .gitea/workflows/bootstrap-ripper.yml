@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p /workspace/bootstrap-ripper
           find /workspace/bootstrap-ripper -mindepth 1 -maxdepth 1 -exec rm -rf {} +
-          cp -a "$GITHUB_WORKSPACE/bootstrap/ripper/." /workspace/bootstrap-ripper/
+          cp -a "$GITHUB_WORKSPACE/bootstrap/arm/." /workspace/bootstrap-ripper/
           chmod +x /workspace/bootstrap-ripper/bootstrap-ripper.sh
 
       - name: Run bootstrap

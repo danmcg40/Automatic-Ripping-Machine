@@ -30,12 +30,16 @@ resource "proxmox_vm_qemu" "ripper" {
 
   memory = var.memory_mb
 
-  # Match your Ubuntu template
   scsihw = "virtio-scsi-pci"
 
-  # Enable serial console
-  serial0 = "socket"
-  vga     = "serial0"
+  serial {
+    id   = 0
+    type = "socket"
+  }
+
+  vga {
+    type = "serial0"
+  }
 
   cpu {
     cores   = var.cpu_cores

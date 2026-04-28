@@ -10,6 +10,5 @@ disk_storage   = "local-lvm"
 network_bridge = "vmbr0"
 
 ssh_user       = "ubuntu"
-ssh_public_key = "ssh-ed25519 AAAA..."
 nameserver     = "192.168.0.1"
 searchdomain   = "local"

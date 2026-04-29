@@ -65,7 +65,7 @@ resource "proxmox_vm_qemu" "ripper" {
   }
 
   ciuser     = var.ssh_user
-  sshkeys    = var.ssh_public_key
+  sshkeys    = trimspace(var.ssh_public_key)
   ipconfig0  = "ip=dhcp"
   nameserver = var.nameserver
   searchdomain = var.searchdomain

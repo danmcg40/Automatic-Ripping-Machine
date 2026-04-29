@@ -1,6 +1,6 @@
 pm_api_url          = "https://192.168.0.60:8006/api2/json"
 
-template_name  = "ubuntu-template"
+template_name  = "ubuntu-template-work"
 vm_name        = "automatic-ripping-machine"
 target_node    = "pve"
 cpu_cores      = 2

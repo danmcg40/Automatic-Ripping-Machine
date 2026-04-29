@@ -18,7 +18,7 @@ variable "target_node" {
 
 variable "template_name" {
   type    = string
-  default = "ubuntu-template"
+  default = "ubuntu-template-work"
 }
 
 variable "vm_name" {

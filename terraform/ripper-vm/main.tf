@@ -54,6 +54,14 @@ resource "proxmox_vm_qemu" "ripper" {
   }
 
   disks {
+  ide {
+    ide2 {
+      cloudinit {
+        storage = var.disk_storage
+      }
+    }
+  }
+  
     scsi {
       scsi0 {
         disk {

@@ -19,8 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y openssh-client
+          apk add --no-cache openssh-client
 
       - name: Prepare persistent bootstrap workspace
         run: |

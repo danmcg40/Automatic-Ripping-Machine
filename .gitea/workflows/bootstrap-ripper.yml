@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y openssh-client
+
       - name: Prepare persistent bootstrap workspace
         run: |
           mkdir -p /workspace/bootstrap-ripper

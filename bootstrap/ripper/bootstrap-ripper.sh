@@ -17,9 +17,9 @@ SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 wait_for_ssh() {
   i=0
-  until ssh $SSH_OPTS "${SSH_USER}@${VM_IP}" "echo ok" >/dev/null 2>&1; do
+  until ssh -vvv $SSH_OPTS "${SSH_USER}@${VM_IP}" "echo ok"; do
     i=$((i + 1))
-    if [ "$i" -ge 60 ]; then
+    if [ "$i" -ge 10 ]; then
       echo "SSH did not become ready on ${VM_IP}"
       exit 1
     fi

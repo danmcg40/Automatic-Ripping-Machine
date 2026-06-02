@@ -21,6 +21,12 @@ jobs:
         run: |
           apk add --no-cache openssh-client
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ARM_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Prepare persistent bootstrap workspace
         run: |
           mkdir -p /workspace/bootstrap-ripper

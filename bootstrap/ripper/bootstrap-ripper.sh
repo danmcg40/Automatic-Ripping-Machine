@@ -13,7 +13,7 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 : "${SMB_PASSWORD:?SMB_PASSWORD is required}"
 : "${SMB_MOUNT:?SMB_MOUNT is required}"
 
-SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+SSH_OPTS="-i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 wait_for_ssh() {
   i=0

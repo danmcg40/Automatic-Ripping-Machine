@@ -34,7 +34,7 @@ ssh $SSH_OPTS "${SSH_USER}@${VM_IP}" "sudo bash -s" <<EOF
 set -eu
 
 apt-get update
-apt-get install -y cifs-utils curl git python3 python3-pip python3-venv ffmpeg abcde handbrake-cli makemkv
+apt-get install -y cifs-utils curl git python3 python3-pip python3-venv ffmpeg abcde handbrake-cli
 
 id arm >/dev/null 2>&1 || useradd -m -s /bin/bash arm
 

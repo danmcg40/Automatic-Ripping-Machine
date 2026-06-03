@@ -84,9 +84,9 @@ fi
 
 cd /opt/automatic-ripping-machine
 
-if [ -f DebianInstaller.sh ]; then
-  chmod +x DebianInstaller.sh
-  ./DebianInstaller.sh
+if [ -f scripts/installers/DebianInstaller.sh ]; then
+  chmod +x scripts/installers/DebianInstaller.sh
+  ./scripts/installers/DebianInstaller.sh
 else
   echo "ERROR: DebianInstaller.sh not found."
   ls -la

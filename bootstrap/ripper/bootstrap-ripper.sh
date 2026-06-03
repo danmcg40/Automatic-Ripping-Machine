@@ -17,9 +17,9 @@ SSH_OPTS="-i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/de
 
 wait_for_ssh() {
   i=0
-  until ssh -vvv $SSH_OPTS "${SSH_USER}@${VM_IP}" "echo ok"; do
+  until ssh $SSH_OPTS "${SSH_USER}@${VM_IP}" "echo ok" >/dev/null 2>&1; do
     i=$((i + 1))
-    if [ "$i" -ge 10 ]; then
+    if [ "$i" -ge 30 ]; then
       echo "SSH did not become ready on ${VM_IP}"
       exit 1
     fi
@@ -38,7 +38,7 @@ apt-get install -y cifs-utils keyutils curl git python3 python3-pip python3-venv
 
 id arm >/dev/null 2>&1 || useradd -m -s /bin/bash arm
 
-mkdir -p ${SMB_MOUNT}
+mkdir -p "${SMB_MOUNT}"
 mkdir -p /etc/samba-credentials
 
 cat > /etc/samba-credentials/arm <<CREDS
@@ -48,13 +48,24 @@ CREDS
 
 chmod 600 /etc/samba-credentials/arm
 
-grep -q '${SMB_MOUNT}' /etc/fstab || echo '//${SMB_SERVER}/${SMB_SHARE} ${SMB_MOUNT} cifs credentials=/etc/samba-credentials/arm,iocharset=utf8,uid=arm,gid=arm,file_mode=0664,dir_mode=0775,nofail 0 0' >> /etc/fstab
+# Remove any old fstab line for this mount path
+sed -i "\\# ${SMB_MOUNT} #d" /etc/fstab
+sed -i "\\#${SMB_MOUNT}#d" /etc/fstab
 
-mount -a
+echo "//${SMB_SERVER}/${SMB_SHARE} ${SMB_MOUNT} cifs credentials=/etc/samba-credentials/arm,iocharset=utf8,uid=arm,gid=arm,file_mode=0664,dir_mode=0775,vers=3.0,sec=ntlmssp,nofail,_netdev 0 0" >> /etc/fstab
 
-mkdir -p ${SMB_MOUNT}/raw
-mkdir -p ${SMB_MOUNT}/completed
-mkdir -p ${SMB_MOUNT}/logs
+echo "Testing SMB mount..."
+if ! mount "${SMB_MOUNT}"; then
+  echo "SMB mount failed. Recent kernel messages:"
+  dmesg | tail -80
+  exit 1
+fi
+
+mkdir -p "${SMB_MOUNT}/raw"
+mkdir -p "${SMB_MOUNT}/completed"
+mkdir -p "${SMB_MOUNT}/logs"
+
+chown -R arm:arm "${SMB_MOUNT}/raw" "${SMB_MOUNT}/completed" "${SMB_MOUNT}/logs" || true
 
 # Placeholder install path for ARM app
 # Replace with your preferred ARM install method later.

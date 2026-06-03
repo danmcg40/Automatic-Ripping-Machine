@@ -52,7 +52,7 @@ chmod 600 /etc/samba-credentials/arm
 sed -i "\\# ${SMB_MOUNT} #d" /etc/fstab
 sed -i "\\#${SMB_MOUNT}#d" /etc/fstab
 
-echo "//${SMB_SERVER}/${SMB_SHARE} ${SMB_MOUNT} cifs credentials=/etc/samba-credentials/arm,iocharset=utf8,uid=arm,gid=arm,file_mode=0664,dir_mode=0775,vers=3.0,sec=ntlmssp,nofail,_netdev 0 0" >> /etc/fstab
+echo "//${SMB_SERVER}/${SMB_SHARE} ${SMB_MOUNT} cifs credentials=/etc/samba-credentials/arm,uid=arm,gid=arm,file_mode=0664,dir_mode=0775,vers=3.0,sec=ntlmssp,nofail,_netdev 0 0" >> /etc/fstab
 
 echo "Testing SMB mount..."
 if ! mount "${SMB_MOUNT}"; then

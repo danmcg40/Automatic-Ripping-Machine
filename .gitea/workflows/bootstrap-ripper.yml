@@ -34,6 +34,20 @@ jobs:
           cp -a "$GITHUB_WORKSPACE/bootstrap/ripper/." /workspace/bootstrap-ripper/
           chmod +x /workspace/bootstrap-ripper/bootstrap-ripper.sh
 
+      - name: Create ripper.env
+        run: |
+          cat > /workspace/bootstrap-ripper/ripper.env <<EOF
+          VM_IP="192.168.0.155"
+          SSH_USER="ubuntu"
+          SMB_SERVER="192.168.0.12"
+          SMB_SHARE="media"
+          SMB_USERNAME="ARM"
+          SMB_PASSWORD="${{ secrets.ARM_PASSWORD }}"
+          SMB_MOUNT="/mnt/media"
+          ARM_USER="arm"
+          ARM_GROUP="arm"
+          EOF
+
       - name: Run bootstrap
         run: |
           cd /workspace/bootstrap-ripper

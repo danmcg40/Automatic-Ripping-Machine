@@ -37,6 +37,8 @@ add-apt-repository ppa:heyarje/makemkv-beta
 apt-get update
 apt-get install -y cifs-utils keyutils curl git python3 python3-pip python3-venv ffmpeg abcde handbrake-cli nginx supervisor makemkv-bin makemkv-oss
 
+echo "DEBUG: reached line before suspected failure"
+
 id arm >/dev/null 2>&1 || useradd -m -s /bin/bash arm
 
 mkdir -p "${SMB_MOUNT}"

@@ -91,7 +91,10 @@ cd /opt/automatic-ripping-machine
 
 if [ -f scripts/installers/DebianInstaller.sh ]; then
   chmod +x scripts/installers/DebianInstaller.sh
-  printf 'Y\n' | bash scripts/installers/DebianInstaller.sh -p 8080
+  echo "Installer refused this distro. Showing Ubuntu install docs:"
+  ls -la arm_wiki
+  sed -n '1,220p' arm_wiki/Ubuntu-25.04-Install.md
+  exit 1
 else
   echo "ERROR: DebianInstaller.sh not found."
   ls -la

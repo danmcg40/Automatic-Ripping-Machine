@@ -67,8 +67,35 @@ mkdir -p "${SMB_MOUNT}/logs"
 
 chown -R arm:arm "${SMB_MOUNT}/raw" "${SMB_MOUNT}/completed" "${SMB_MOUNT}/logs" || true
 
-# Placeholder install path for ARM app
-# Replace with your preferred ARM install method later.
+echo "Installing ARM native app..."
+
+apt-get install -y \
+  lsscsi sg3-utils eject udev \
+  libssl-dev libffi-dev build-essential \
+  libcurl4-openssl-dev libxml2-dev libxslt1-dev zlib1g-dev \
+  nginx supervisor
+
+cd /opt
+
+if [ ! -d /opt/automatic-ripping-machine ]; then
+  git clone https://github.com/automatic-ripping-machine/automatic-ripping-machine.git
+fi
+
+cd /opt/automatic-ripping-machine
+
+if [ -f DebianInstaller.sh ]; then
+  chmod +x DebianInstaller.sh
+  ./DebianInstaller.sh
+else
+  echo "ERROR: DebianInstaller.sh not found."
+  ls -la
+  exit 1
+fi
+
+echo "Checking ARM services and ports..."
+systemctl status nginx --no-pager || true
+systemctl status supervisor --no-pager || true
+ss -tlnp | grep -E ':80|:8080' || true
 EOF
 
 echo "Bootstrap complete for ${VM_IP}"

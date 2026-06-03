@@ -73,38 +73,58 @@ mkdir -p "${SMB_MOUNT}/logs"
 
 chown -R arm:arm "${SMB_MOUNT}/raw" "${SMB_MOUNT}/completed" "${SMB_MOUNT}/logs" || true
 
-echo "Installing ARM native app..."
+echo "Installing ARM native app manually..."
 
 apt-get install -y \
-  lsscsi sg3-utils eject udev \
-  libssl-dev libffi-dev build-essential \
-  libcurl4-openssl-dev libxml2-dev libxslt1-dev zlib1g-dev \
-  nginx supervisor
+  git python3-venv libcurl4-gnutls-dev gcc python3-dev libffi-dev \
+  libdiscid0 handbrake-cli eject lsdvd at makemkv-bin makemkv-oss
+
+id arm >/dev/null 2>&1 || useradd -m arm -g arm -G cdrom
 
 cd /opt
+rm -rf /opt/arm
+git clone --recurse-submodules https://github.com/automatic-ripping-machine/automatic-ripping-machine.git /opt/arm
+chown -R arm:arm /opt/arm
+chmod 775 /opt/arm
 
-if [ ! -d /opt/automatic-ripping-machine ]; then
-  git clone https://github.com/automatic-ripping-machine/automatic-ripping-machine.git
-fi
+cp /opt/arm/setup/51-automatic-ripping-machine-venv.rules /etc/udev/rules.d/
+chmod +x /opt/arm/scripts/thickclient/arm_venv_wrapper.sh
 
-cd /opt/automatic-ripping-machine
+cp /opt/arm/setup/arm.yaml /opt/arm/arm.yaml
+chown arm:arm /opt/arm/arm.yaml
 
-if [ -f scripts/installers/DebianInstaller.sh ]; then
-  chmod +x scripts/installers/DebianInstaller.sh
-  echo "Installer refused this distro. Showing Ubuntu install docs:"
-  ls -la arm_wiki
-  sed -n '1,220p' arm_wiki/Ubuntu-25.04-Install.md
-  exit 1
-else
-  echo "ERROR: DebianInstaller.sh not found."
-  ls -la
-  exit 1
-fi
+mkdir -p /etc/arm/config
+ln -sf /opt/arm/arm.yaml /etc/arm/config/arm.yaml
+cp /opt/arm/setup/apprise.yaml /etc/arm/config/apprise.yaml
+cp --no-clobber /opt/arm/setup/.abcde.conf /etc/.abcde.conf || true
+chown arm:arm /etc/.abcde.conf
+ln -sf /etc/.abcde.conf /etc/arm/config/abcde.conf
 
-echo "Checking ARM services and ports..."
-systemctl status nginx --no-pager || true
-systemctl status supervisor --no-pager || true
-ss -tlnp | grep -E ':80|:8080' || true
+sudo -u arm mkdir -p /home/arm/logs/progress
+sudo -u arm mkdir -p /home/arm/media/raw
+sudo -u arm mkdir -p /home/arm/media/transcode
+sudo -u arm mkdir -p /home/arm/media/completed
+
+sed -i 's/^cffi==.*/cffi/' /opt/arm/arm-dependencies/requirements.txt || true
+sed -i 's/^SQLAlchemy==.*/SQLAlchemy/' /opt/arm/arm-dependencies/requirements.txt || true
+
+sudo -u arm bash -c '
+cd /opt/arm
+python3 -m venv venv
+. venv/bin/activate
+pip install --upgrade pip
+pip install -r arm-dependencies/requirements.txt
+'
+
+cp /opt/arm/setup/armui.service /etc/systemd/system/armui.service
+
+systemctl daemon-reload
+systemctl enable armui
+systemctl restart armui
+
+ss -tlnp | grep -E ":80|:8080" || true
+systemctl status armui --no-pager || true
+
 EOF
 
 echo "Bootstrap complete for ${VM_IP}"

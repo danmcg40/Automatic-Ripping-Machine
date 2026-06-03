@@ -57,7 +57,7 @@ sed -i "\\#${SMB_MOUNT}#d" /etc/fstab
 
 echo "//${SMB_SERVER}/${SMB_SHARE} ${SMB_MOUNT} cifs credentials=/etc/samba-credentials/arm,uid=arm,gid=arm,file_mode=0664,dir_mode=0775,vers=3.0,sec=ntlmssp,nofail,_netdev 0 0" >> /etc/fstab
 
-eecho "Testing SMB mount..."
+echo "Testing SMB mount..."
 if ! mount "${SMB_MOUNT}"; then
   echo "mount ${SMB_MOUNT} failed, trying mount -a..."
   if ! mount -a; then

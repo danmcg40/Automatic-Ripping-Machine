@@ -33,6 +33,7 @@ wait_for_ssh
 ssh $SSH_OPTS "${SSH_USER}@${VM_IP}" "sudo bash -s" <<EOF
 set -eu
 
+add-apt-repository ppa:heyarje/makemkv-beta
 apt-get update
 apt-get install -y cifs-utils keyutils curl git python3 python3-pip python3-venv ffmpeg abcde handbrake-cli nginx supervisor makemkv-bin makemkv-oss
 

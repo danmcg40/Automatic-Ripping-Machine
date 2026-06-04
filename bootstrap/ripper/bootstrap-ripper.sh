@@ -33,13 +33,14 @@ wait_for_ssh
 ssh $SSH_OPTS "${SSH_USER}@${VM_IP}" "sudo bash -s" <<EOF
 set -eu
 
-add-apt-repository ppa:heyarje/makemkv-beta
+add-apt-repository ppa:heyarje/makemkv-beta -y
 apt-get update
 apt-get install -y cifs-utils keyutils curl git python3 python3-pip python3-venv ffmpeg abcde handbrake-cli nginx supervisor makemkv-bin makemkv-oss
 
 echo "DEBUG: reached line before suspected failure"
 
 id arm >/dev/null 2>&1 || useradd -m -s /bin/bash arm
+usermod -aG cdrom arm
 
 mkdir -p "${SMB_MOUNT}"
 mkdir -p /etc/samba-credentials
@@ -68,18 +69,21 @@ if ! mount "${SMB_MOUNT}"; then
 fi
 
 mkdir -p "${SMB_MOUNT}/raw"
+mkdir -p "${SMB_MOUNT}/transcode"
 mkdir -p "${SMB_MOUNT}/completed"
 mkdir -p "${SMB_MOUNT}/logs"
 
-chown -R arm:arm "${SMB_MOUNT}/raw" "${SMB_MOUNT}/completed" "${SMB_MOUNT}/logs" || true
+chown -R arm:arm \
+  "${SMB_MOUNT}/raw" \
+  "${SMB_MOUNT}/transcode" \
+  "${SMB_MOUNT}/completed" \
+  "${SMB_MOUNT}/logs" || true
 
 echo "Installing ARM native app manually..."
 
 apt-get install -y \
   git python3-venv libcurl4-gnutls-dev gcc python3-dev libffi-dev \
   libdiscid0 handbrake-cli eject lsdvd at makemkv-bin makemkv-oss
-
-id arm >/dev/null 2>&1 || useradd -m arm -g arm -G cdrom
 
 cd /opt
 rm -rf /opt/arm
@@ -91,6 +95,12 @@ cp /opt/arm/setup/51-automatic-ripping-machine-venv.rules /etc/udev/rules.d/
 chmod +x /opt/arm/scripts/thickclient/arm_venv_wrapper.sh
 
 cp /opt/arm/setup/arm.yaml /opt/arm/arm.yaml
+
+sed -i "s#^RAW_PATH:.*#RAW_PATH: ${SMB_MOUNT}/raw#" /opt/arm/arm.yaml
+sed -i "s#^TRANSCODE_PATH:.*#TRANSCODE_PATH: ${SMB_MOUNT}/transcode#" /opt/arm/arm.yaml
+sed -i "s#^COMPLETED_PATH:.*#COMPLETED_PATH: ${SMB_MOUNT}/completed#" /opt/arm/arm.yaml
+sed -i "s#^LOGPATH:.*#LOGPATH: ${SMB_MOUNT}/logs#" /opt/arm/arm.yaml
+
 chown arm:arm /opt/arm/arm.yaml
 
 mkdir -p /etc/arm/config
@@ -121,6 +131,9 @@ cp /opt/arm/setup/armui.service /etc/systemd/system/armui.service
 systemctl daemon-reload
 systemctl enable armui
 systemctl restart armui
+
+echo "ARM configured paths:"
+grep -E "RAW_PATH|TRANSCODE_PATH|COMPLETED_PATH|LOGPATH" /opt/arm/arm.yaml || true
 
 ss -tlnp | grep -E ":80|:8080" || true
 systemctl status armui --no-pager || true

@@ -1,4 +1,4 @@
-pm_api_url          = "https://192.168.0.60:8006/api2/json"
+pm_api_url          = var.pm_api_url
 
 template_name  = "ubuntu-template-work"
 vm_name        = "automatic-ripping-machine"
